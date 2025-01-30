@@ -15,12 +15,29 @@ import {
   WhatsAppNumberDto,
 } from '@api/dto/chat.dto';
 import { InstanceDto } from '@api/dto/instance.dto';
-import { Query } from '@api/repository/repository.service';
+import { PrismaRepository, Query } from '@api/repository/repository.service';
 import { WAMonitoringService } from '@api/services/monitor.service';
 import { Contact, Message, MessageUpdate } from '@prisma/client';
 
 export class ChatController {
-  constructor(private readonly waMonitor: WAMonitoringService) {}
+  public prismaRepository: PrismaRepository;
+
+  // constructor(private readonly waMonitor: WAMonitoringService) {}
+
+  constructor(
+    prismaRepository: PrismaRepository,
+    private readonly waMonitor: WAMonitoringService,
+  ) {
+    this.prisma = prismaRepository;
+  }
+
+  public set prisma(prisma: PrismaRepository) {
+    this.prismaRepository = prisma;
+  }
+
+  public get prisma() {
+    return this.prismaRepository;
+  }
 
   public async whatsappNumber({ instanceName }: InstanceDto, data: WhatsAppNumberDto) {
     return await this.waMonitor.waInstances[instanceName].whatsappNumber(data);
@@ -108,5 +125,11 @@ export class ChatController {
 
   public async blockUser({ instanceName }: InstanceDto, data: BlockUserDto) {
     return await this.waMonitor.waInstances[instanceName].blockUser(data);
+  }
+
+  public async getAll({ instanceId }: InstanceDto) {
+    return await this.prisma.chat.findMany({
+      where: { instanceId },
+    });
   }
 }

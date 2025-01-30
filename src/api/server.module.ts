@@ -97,7 +97,7 @@ export const instanceController = new InstanceController(
 );
 export const sendMessageController = new SendMessageController(waMonitor);
 export const callController = new CallController(waMonitor);
-export const chatController = new ChatController(waMonitor);
+export const chatController = new ChatController(prismaRepository, waMonitor);
 export const groupController = new GroupController(waMonitor);
 export const labelController = new LabelController(waMonitor);
 
