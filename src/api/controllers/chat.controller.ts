@@ -127,9 +127,24 @@ export class ChatController {
     return await this.waMonitor.waInstances[instanceName].blockUser(data);
   }
 
-  public async getAll({ instanceId }: InstanceDto) {
-    return await this.prisma.chat.findMany({
-      where: { instanceId },
-    });
+  // public async getAll({ instanceId }: InstanceDto) {
+  //   return await this.prisma.chat.findMany({
+  //     where: { instanceId },
+  //   });
+  // }
+  public async getAll({ instanceName }: InstanceDto) {
+    return await this.prisma.$queryRaw`
+      SELECT
+       	c.*,
+        c2.*
+      FROM
+     	  "Chat" c
+      INNER JOIN "Contact" c2 ON
+     	  (c."remoteJid" = c2."remoteJid")
+      INNER JOIN "Instance" i ON
+     	  (c."instanceId" = i.id)
+      WHERE
+        i."name" = ${instanceName}
+    `;
   }
 }
