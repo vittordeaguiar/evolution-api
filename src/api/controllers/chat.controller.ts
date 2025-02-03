@@ -127,24 +127,33 @@ export class ChatController {
     return await this.waMonitor.waInstances[instanceName].blockUser(data);
   }
 
-  // public async getAll({ instanceId }: InstanceDto) {
-  //   return await this.prisma.chat.findMany({
-  //     where: { instanceId },
-  //   });
-  // }
   public async getAll({ instanceName }: InstanceDto) {
     return await this.prisma.$queryRaw`
       SELECT
-       	c.*,
-        c2.*
-      FROM
-     	  "Chat" c
-      INNER JOIN "Contact" c2 ON
-     	  (c."remoteJid" = c2."remoteJid")
-      INNER JOIN "Instance" i ON
-     	  (c."instanceId" = i.id)
-      WHERE
-        i."name" = ${instanceName}
+        c.*,
+        c2.*,
+        (
+          SELECT m."message"->>'conversation'
+          FROM "Message" m
+          WHERE m."instanceId" = c."instanceId"
+            AND m."key"->>'remoteJid' = c."remoteJid"
+          ORDER BY m."messageTimestamp" DESC
+          LIMIT 1
+        ) AS "lastMessage",
+        (
+          SELECT to_timestamp(m."messageTimestamp")
+          FROM "Message" m
+          WHERE m."instanceId" = c."instanceId"
+            AND m."key"->>'remoteJid' = c."remoteJid"
+          ORDER BY m."messageTimestamp" DESC
+          LIMIT 1
+        ) AS "lastMessageDate"
+      FROM "Chat" c
+      INNER JOIN "Contact" c2
+        ON c."remoteJid" = c2."remoteJid"
+      INNER JOIN "Instance" i
+        ON c."instanceId" = i.id
+      WHERE i."name" = ${instanceName}
     `;
   }
 }

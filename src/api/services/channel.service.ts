@@ -697,14 +697,14 @@ export class ChannelStartupService {
             "Contact"."pushName",
             "Contact"."profilePicUrl",
             COALESCE(
-              to_timestamp("Message"."messageTimestamp"::double precision), 
+              to_timestamp("Message"."messageTimestamp"::double precision),
               "Contact"."updatedAt"
             ) as "updatedAt",
             "Chat"."createdAt" as "windowStart",
             "Chat"."createdAt" + INTERVAL '24 hours' as "windowExpires",
-            CASE 
-              WHEN "Chat"."createdAt" + INTERVAL '24 hours' > NOW() THEN true 
-              ELSE false 
+            CASE
+              WHEN "Chat"."createdAt" + INTERVAL '24 hours' > NOW() THEN true
+              ELSE false
             END as "windowActive",
             "Message"."id" AS lastMessageId,
             "Message"."key" AS lastMessage_key,
@@ -720,19 +720,19 @@ export class ChannelStartupService {
             "Message"."status" AS lastMessageStatus
           FROM "Contact"
           INNER JOIN "Message" ON "Message"."key"->>'remoteJid' = "Contact"."remoteJid"
-          LEFT JOIN "Chat" ON "Chat"."remoteJid" = "Contact"."remoteJid" 
+          LEFT JOIN "Chat" ON "Chat"."remoteJid" = "Contact"."remoteJid"
             AND "Chat"."instanceId" = "Contact"."instanceId"
-          WHERE 
+          WHERE
             "Contact"."instanceId" = ${this.instanceId}
             AND "Message"."instanceId" = ${this.instanceId}
             ${remoteJid ? Prisma.sql`AND "Contact"."remoteJid" = ${remoteJid}` : Prisma.sql``}
             ${timestampFilter}
-          ORDER BY 
+          ORDER BY
             "Contact"."remoteJid",
             "Message"."messageTimestamp" DESC
         )
-        SELECT * FROM rankedMessages
-        ORDER BY updatedAt DESC NULLS LAST;
+        SELECT * FROM rankedMessages;
+        --ORDER BY updatedAt DESC NULLS LAST;
     `;
 
     if (results && isArray(results) && results.length > 0) {
