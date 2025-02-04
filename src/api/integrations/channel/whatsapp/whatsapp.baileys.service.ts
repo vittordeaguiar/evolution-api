@@ -1357,7 +1357,7 @@ export class BaileysStartupService extends ChannelStartupService {
             where: { remoteJid: received.key.remoteJid, instanceId: this.instanceId },
           });
 
-          const contactRaw: { remoteJid: string; pushName: string; profilePicUrl?: string; instanceId: string } = {
+          const contactRaw: { remoteJid: string; pushName?: string; profilePicUrl?: string; instanceId: string } = {
             remoteJid: received.key.remoteJid,
             // pushName: received.key.fromMe ? '' : received.key.fromMe == null ? '' : received.pushName,
             profilePicUrl: (await this.profilePicture(received.key.remoteJid)).profilePictureUrl,

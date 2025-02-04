@@ -704,6 +704,7 @@ export class ChannelStartupService {
               WHEN "Chat"."createdAt" + INTERVAL '24 hours' > NOW() THEN true
               ELSE false
             END as "windowActive",
+            "Chat"."unreadMessages" as "unreadMessages",
             "Message"."id" AS lastMessageId,
             "Message"."key" AS lastMessage_key,
             "Message"."pushName" AS lastMessagePushName,
@@ -762,6 +763,7 @@ export class ChannelStartupService {
           windowExpires: contact.windowExpires,
           windowActive: contact.windowActive,
           lastMessage: lastMessage ? this.cleanMessageData(lastMessage) : undefined,
+          unreadMessages: contact.unreadMessages,
         };
       });
 
