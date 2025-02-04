@@ -202,6 +202,7 @@ export class EvolutionStartupService extends ChannelStartupService {
           data: messageRaw,
         });
 
+        console.log('Message received', messageRaw);
         await this.updateContact({
           remoteJid: messageRaw.key.remoteJid,
           pushName: messageRaw.pushName,
@@ -214,6 +215,12 @@ export class EvolutionStartupService extends ChannelStartupService {
   }
 
   private async updateContact(data: { remoteJid: string; pushName?: string; profilePicUrl?: string }) {
+    console.log(
+      'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+    );
+
+    this.logger.debug('ESTOU AQUI');
+
     const contactRaw: any = {
       remoteJid: data.remoteJid,
       pushName: data?.pushName,
