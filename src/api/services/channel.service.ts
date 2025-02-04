@@ -729,8 +729,8 @@ export class ChannelStartupService {
             "Contact"."remoteJid",
             "Message"."messageTimestamp" DESC
         )
-        SELECT * FROM rankedMessages;
-        --ORDER BY updatedAt DESC NULLS LAST;
+        SELECT * FROM rankedMessages
+        ORDER BY "updatedAt" DESC NULLS LAST;
     `;
 
     if (results && isArray(results) && results.length > 0) {
