@@ -716,7 +716,9 @@ export class ChannelStartupService {
             "Message"."messageTimestamp" AS lastMessageMessageTimestamp,
             "Message"."instanceId" AS lastMessageInstanceId,
             "Message"."sessionId" AS lastMessageSessionId,
-            "Message"."status" AS lastMessageStatus
+            "Message"."status" AS lastMessageStatus,
+            "Message"."message"->>'conversation' AS "lastMessage",
+            to_timestamp("Message"."messageTimestamp"::double precision) AS "lastMessageDate"
           FROM "Contact"
           INNER JOIN "Message" ON "Message"."key"->>'remoteJid' = "Contact"."remoteJid"
           LEFT JOIN "Chat" ON "Chat"."remoteJid" = "Contact"."remoteJid"
@@ -762,8 +764,9 @@ export class ChannelStartupService {
           windowStart: contact.windowStart,
           windowExpires: contact.windowExpires,
           windowActive: contact.windowActive,
-          lastMessage: lastMessage ? this.cleanMessageData(lastMessage) : undefined,
+          lastMessage: lastMessage ? this.cleanMessageData(lastMessage) : contact.lastMessage,
           unreadMessages: contact.unreadMessages,
+          lastMessageDate: contact.lastMessageDate,
         };
       });
 
