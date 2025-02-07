@@ -202,7 +202,6 @@ export class EvolutionStartupService extends ChannelStartupService {
           data: messageRaw,
         });
 
-        console.log('Message received', messageRaw);
         await this.updateContact({
           remoteJid: messageRaw.key.remoteJid,
           pushName: messageRaw.pushName,
