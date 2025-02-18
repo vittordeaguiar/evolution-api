@@ -643,12 +643,37 @@ export class ChannelStartupService {
       },
     });
 
+    const contacts = await this.prismaRepository.contact.findMany({
+      where: { instanceId: this.instanceId },
+      select: {
+        remoteJid: true,
+        profilePicUrl: true,
+        pushName: true,
+      },
+    });
+
+    const messagesMapped = messages.map((msg) => {
+      const key = typeof msg.key === 'string' ? JSON.parse(msg.key) : msg.key;
+
+      const jidToSearch = key.participant || key.remoteJid;
+
+      const contact = contacts.find((c) => c.remoteJid === jidToSearch);
+
+      if (contact) {
+        key.profilePicUrl = contact.profilePicUrl;
+        key.pushName = contact.pushName;
+      }
+
+      return { ...msg, key };
+    });
+
     return {
       messages: {
         total: count,
         pages: Math.ceil(count / query.offset),
         currentPage: query.page,
-        records: messages,
+        // records: messages,
+        records: messagesMapped,
       },
     };
   }
