@@ -780,8 +780,6 @@ export class ChannelStartupService {
             }
           : undefined;
 
-        console.log(contact.lastmessagemessagetype);
-
         return {
           id: contact.id,
           remoteJid: contact.remoteJid,
