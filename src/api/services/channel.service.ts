@@ -780,6 +780,8 @@ export class ChannelStartupService {
             }
           : undefined;
 
+        console.log(contact.lastmessagemessagetype);
+
         return {
           id: contact.id,
           remoteJid: contact.remoteJid,
@@ -792,6 +794,7 @@ export class ChannelStartupService {
           lastMessage: lastMessage ? this.cleanMessageData(lastMessage) : contact.lastMessage,
           unreadMessages: contact.unreadMessages,
           lastMessageDate: contact.lastMessageDate,
+          messageType: contact.lastmessagemessagetype,
         };
       });
 
