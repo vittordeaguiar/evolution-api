@@ -3423,17 +3423,50 @@ export class BaileysStartupService extends ChannelStartupService {
 
   public async markMessageAsRead(data: ReadMessageDto) {
     try {
-      const keys: proto.IMessageKey[] = [];
-      data.readMessages.forEach((read) => {
-        if (isJidGroup(read.remoteJid) || isJidUser(read.remoteJid)) {
-          keys.push({
-            remoteJid: read.remoteJid,
-            fromMe: read.fromMe,
-            id: read.id,
+      // 1. Monta o array de keys para a API do WhatsApp
+      const keys: proto.IMessageKey[] = data.readMessages
+        .filter((read) => isJidGroup(read.remoteJid) || isJidUser(read.remoteJid))
+        .map((read) => ({
+          remoteJid: read.remoteJid,
+          fromMe: read.fromMe,
+          id: read.id,
+        }));
+
+      // 2. Marca como lidas na API do WhatsApp
+      await this.client.readMessages(keys);
+
+      // 3. Atualiza cada mensagem no banco de dados
+      for (const read of data.readMessages) {
+        // Atualiza o status da(s) mensagem(ns) correspondente(s)
+        const updated = await this.prismaRepository.message.updateMany({
+          where: {
+            instanceId: this.instance.id,
+            AND: [
+              { key: { path: ['remoteJid'], equals: read.remoteJid } },
+              { key: { path: ['fromMe'], equals: read.fromMe } },
+              { key: { path: ['id'], equals: read.id } },
+            ],
+          },
+          data: {
+            status: 'READ', // Ajuste de acordo com sua lógica
+          },
+        });
+
+        // Se necessário, zerar/decrementar `unreadMessages` de Chat
+        // Exemplo simples: zerar `unreadMessages` para o chat correspondente
+        if (updated.count > 0) {
+          await this.prismaRepository.chat.updateMany({
+            where: {
+              remoteJid: read.remoteJid,
+              instanceId: this.instance.id,
+            },
+            data: {
+              unreadMessages: 0,
+            },
           });
         }
-      });
-      await this.client.readMessages(keys);
+      }
+
       return { message: 'Read messages', read: 'success' };
     } catch (error) {
       throw new InternalServerErrorException('Read messages fail', error.toString());
