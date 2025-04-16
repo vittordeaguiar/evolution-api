@@ -188,8 +188,13 @@ export class ChatRouter extends RouterBroker {
         return res.status(HttpStatus.OK).json(response);
       })
       .post(this.routerPath('findChatsPaginated'), ...guards, async (req, res) => {
+        const payload = { ...req.body };
+
+        delete payload.sort;
+        delete payload.offset;
+
         const response = await this.dataValidate<Query<Contact>>({
-          request: req,
+          request: { ...req, body: payload } as typeof req,
           schema: contactPaginatedValidateSchema,
           ClassRef: Query<Contact>,
           execute: (instance, data) =>
