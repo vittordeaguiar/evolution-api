@@ -22,6 +22,7 @@ import { Contact, Message, MessageUpdate } from '@prisma/client';
 import {
   archiveChatSchema,
   blockUserSchema,
+  contactPaginatedValidateSchema,
   contactValidateSchema,
   deleteMessageSchema,
   markChatUnreadSchema,
@@ -185,6 +186,17 @@ export class ChatRouter extends RouterBroker {
         });
 
         return res.status(HttpStatus.OK).json(response);
+      })
+      .post(this.routerPath('findChatsPaginated'), ...guards, async (req, res) => {
+        const response = await this.dataValidate<Query<Contact>>({
+          request: req,
+          schema: contactPaginatedValidateSchema,
+          ClassRef: Query<Contact>,
+          execute: (instance, data) =>
+            chatController.fetchChatsPaginated(instance, data, req.body.page ?? 1, req.body.pageSize ?? 100),
+        });
+
+        res.status(200).json(response);
       })
       // Profile routes
       .post(this.routerPath('fetchBusinessProfile'), ...guards, async (req, res) => {

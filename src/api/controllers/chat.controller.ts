@@ -87,6 +87,15 @@ export class ChatController {
     return await this.waMonitor.waInstances[instanceName].fetchChats(query);
   }
 
+  public async fetchChatsPaginated(
+    { instanceName }: InstanceDto,
+    query: Query<Contact>,
+    page: number = 1,
+    pageSize: number = 100,
+  ) {
+    return await this.waMonitor.waInstances[instanceName].fetchChatsPaginated(query, page, pageSize);
+  }
+
   public async sendPresence({ instanceName }: InstanceDto, data: SendPresenceDto) {
     return await this.waMonitor.waInstances[instanceName].sendPresence(data);
   }

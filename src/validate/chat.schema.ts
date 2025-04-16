@@ -201,6 +201,45 @@ export const contactValidateSchema: JSONSchema7 = {
   },
 };
 
+export const contactPaginatedValidateSchema: JSONSchema7 = {
+  $id: v4(),
+  type: 'object',
+  properties: {
+    where: {
+      type: 'object',
+      properties: {
+        _id: { type: 'string', minLength: 1 },
+        pushName: { type: 'string', minLength: 1 },
+        id: { type: 'string', minLength: 1 },
+        remoteJid: { type: 'string', minLength: 1 }, // Adicionado para suportar remoteJid
+        messageTimestamp: {
+          type: 'object', // Adicionado para suportar filtro de timestamp
+          properties: {
+            gte: { type: 'string', format: 'date-time' }, // ISO 8601 date
+            lte: { type: 'string', format: 'date-time' }, // ISO 8601 date
+          },
+          additionalProperties: true,
+        },
+      },
+      additionalProperties: true,
+      ...isNotEmpty('_id', 'id', 'pushName', 'remoteJid'), // Inclui remoteJid na validação
+    },
+    page: {
+      type: 'integer',
+      minimum: 1,
+      default: 1, // Valor padrão
+    },
+    pageSize: {
+      type: 'integer',
+      minimum: 1,
+      maximum: 1000, // Limite máximo para evitar abusos
+      default: 100, // Valor padrão
+    },
+  },
+  required: [], // Nenhum campo é obrigatório
+  additionalProperties: true, // Impede propriedades não definidas
+};
+
 export const messageValidateSchema: JSONSchema7 = {
   $id: v4(),
   type: 'object',
