@@ -218,10 +218,10 @@ export const contactPaginatedValidateSchema: JSONSchema7 = {
             gte: { type: 'string', format: 'date-time' }, // ISO 8601 date
             lte: { type: 'string', format: 'date-time' }, // ISO 8601 date
           },
-          additionalProperties: false,
+          additionalProperties: true,
         },
       },
-      additionalProperties: false,
+      additionalProperties: true,
       ...isNotEmpty('_id', 'id', 'pushName', 'remoteJid'), // Inclui remoteJid na validação
     },
     page: {
@@ -237,7 +237,7 @@ export const contactPaginatedValidateSchema: JSONSchema7 = {
     },
   },
   required: [], // Nenhum campo é obrigatório
-  additionalProperties: false, // Impede propriedades não definidas
+  additionalProperties: true, // Impede propriedades não definidas
 };
 
 export const messageValidateSchema: JSONSchema7 = {
